@@ -7,7 +7,7 @@ import { AuthProvider } from "./contexts/AuthContext"
 import { MyRecordings } from "./pages/MyRecordings"
 
 
-export const Base_Url = import.meta.env.VITE_API_URL || 
+export const Base_Url = import.meta.env.VITE_BASE_URL || 
   (import.meta.env.PROD 
     ? 'https://your-backend-url.render.com' 
     : 'http://localhost:8000')
