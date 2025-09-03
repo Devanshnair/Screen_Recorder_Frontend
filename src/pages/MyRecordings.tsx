@@ -83,8 +83,8 @@ function VideoPlayer({ recordingId }: { recordingId: string }) {
 
 export function MyRecordings() {
   const [recordings, setRecordings] = useState<Recording[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const [, setLoading] = useState(true)
+  const [, setError] = useState<string | null>(null)
   const [playingId, setPlayingId] = useState<string | null>(null)
 
   // New: search state (UI only)
