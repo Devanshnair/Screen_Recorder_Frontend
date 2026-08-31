@@ -7,6 +7,15 @@ import { generateDefaultFilename } from "../utils/validation"
 import { useAuth } from "../contexts/AuthContext"
 import { savePendingRecording, clearPendingRecording } from "../utils/recordingStorage"
 import { useRecording } from "../contexts/RecordingContext"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog"
 
 type Props = {
   open: boolean
@@ -34,7 +43,6 @@ export function Modal({ open, onClose, videoUrl, videoBlob }: Props) {
     if (!user) {
       await savePendingRecording({ blob: videoBlob, filename: fileName })
       sessionStorage.setItem("resumeRecordingAfterLogin", "1")
-      // Use the navigation function from recording context
       navigateToLogin()
       return
     }
@@ -84,7 +92,6 @@ export function Modal({ open, onClose, videoUrl, videoBlob }: Props) {
     }
   }
 
-  // Initialize filename when modal opens
   useEffect(() => {
     if (open) {
       const defaultName = generateDefaultFilename()
@@ -92,22 +99,18 @@ export function Modal({ open, onClose, videoUrl, videoBlob }: Props) {
     }
   }, [open])
 
-  // Generate preview image from video
   useEffect(() => {
     if (videoRef.current && videoUrl) {
       videoRef.current.load()
 
       const video = videoRef.current
       const handleLoadedData = () => {
-        // Create canvas to capture frame
         const canvas = document.createElement("canvas")
         const ctx = canvas.getContext("2d")
 
         if (ctx) {
           canvas.width = video.videoWidth
           canvas.height = video.videoHeight
-
-          // Seek to 1 second or 10% of video duration for preview
           video.currentTime = Math.min(1, video.duration * 0.1)
 
           const handleSeeked = () => {
@@ -122,17 +125,14 @@ export function Modal({ open, onClose, videoUrl, videoBlob }: Props) {
       }
 
       video.addEventListener("loadeddata", handleLoadedData)
-
       return () => {
         video.removeEventListener("loadeddata", handleLoadedData)
       }
     }
   }, [videoUrl])
 
-  // On close, also clear pending recording and revoke object URL
   const handleClose = async () => {
-    // Only clear pending recording if we're not in the middle of a login flow
-    const resumeFlag = sessionStorage.getItem('resumeRecordingAfterLogin');
+    const resumeFlag = sessionStorage.getItem("resumeRecordingAfterLogin")
     if (!resumeFlag) {
       await clearPendingRecording()
     }
@@ -142,49 +142,29 @@ export function Modal({ open, onClose, videoUrl, videoBlob }: Props) {
     onClose()
   }
 
-  if (!open) return null
-
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center px-4"
-      role="dialog"
-      aria-modal="true"
-      aria-label="Recording preview"
-    >
-      {/* Backdrop */}
-  <button aria-label="Close" onClick={handleClose} className="absolute inset-0 bg-slate-900/50" />
+    <Dialog open={open} onOpenChange={(isOpen) => { if (!isOpen) handleClose() }}>
+      <DialogContent className="max-w-xl bg-white dark:bg-slate-900 border-violet-600/30 dark:border-slate-800">
+        <DialogHeader>
+          <DialogTitle className="text-slate-900 dark:text-white">Preview &amp; Export</DialogTitle>
+          <DialogDescription className="text-slate-600 dark:text-slate-400">
+            Review your recording and customize the filename
+          </DialogDescription>
+        </DialogHeader>
 
-      {/* Dialog */}
-      <div className="relative z-10 w-full max-w-xl rounded-2xl bg-white shadow-2xl border border-violet-600/30">
-        <div className="flex items-center justify-between px-6 py-5 border-b border-gray-100">
-          <div>
-            <h2 className="text-xl font-semibold text-slate-900">Preview & Export</h2>
-            <p className="text-sm text-slate-600 mt-1">Review your recording and customize the filename</p>
-          </div>
-          <button
-            onClick={handleClose}
-            className="rounded-full p-2 text-slate-400 hover:text-slate-600 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-violet-600 transition-colors"
-            aria-label="Close preview"
-          >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-              <path d="M6 6l12 12M18 6L6 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-            </svg>
-          </button>
-        </div>
-
-        <div className="p-6">
+        <div>
           {/* Filename Input */}
           <div className="mb-6">
-            <label htmlFor="filename" className="block text-sm font-medium text-slate-700 mb-2">
+            <label htmlFor="filename" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
               Filename
             </label>
             <div className="relative">
-              <input
+              <Input
                 id="filename"
                 type="text"
                 value={fileName}
                 onChange={(e) => setFileName(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-1 focus:ring-violet-400 focus:border-transparent focus:outline-none focus:shadow-sm focus:shadow-violet-300  transition-shadow text-sm"
+                className="pr-14 bg-white dark:bg-slate-800 dark:text-slate-100 focus-visible:ring-violet-400"
                 placeholder="Enter filename..."
               />
               <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-sm text-slate-500 pointer-events-none">
@@ -194,7 +174,7 @@ export function Modal({ open, onClose, videoUrl, videoBlob }: Props) {
           </div>
 
           {/* Video Preview */}
-          <div className="aspect-video w-full overflow-hidden rounded-xl border border-gray-200 shadow-inner bg-gray-50">
+          <div className="aspect-video w-full overflow-hidden rounded-xl border border-gray-200 dark:border-slate-800 shadow-inner bg-gray-50 dark:bg-slate-950">
             {videoUrl ? (
               <video
                 ref={videoRef}
@@ -217,7 +197,7 @@ export function Modal({ open, onClose, videoUrl, videoBlob }: Props) {
                       />
                     </svg>
                   </div>
-                  <p className="text-slate-600 text-sm">Your recording preview will appear here</p>
+                  <p className="text-slate-600 dark:text-slate-400 text-sm">Your recording preview will appear here</p>
                 </div>
               </div>
             )}
@@ -225,30 +205,36 @@ export function Modal({ open, onClose, videoUrl, videoBlob }: Props) {
 
           {/* Action Buttons */}
           <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-end">
-            <a
-              href={videoUrl || undefined}
-              download={videoUrl && fileName ? `${fileName}.webm` : undefined}
-              className="inline-flex items-center justify-center gap-2 rounded-lg bg-violet-600 px-6 py-3 text-sm font-semibold text-white hover:bg-violet-700 focus:outline-none focus:ring-2 focus:ring-violet-600 focus:ring-offset-2 transition-colors shadow-sm"
+            <Button
+              variant="outline"
+              asChild
+              className="dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
             >
-              <Download className="w-5 h-5" />
-              Download
-            </a>
-            <button
+              <a
+                href={videoUrl || undefined}
+                download={videoUrl && fileName ? `${fileName}.webm` : undefined}
+              >
+                <Download className="w-5 h-5" />
+                Download
+              </a>
+            </Button>
+
+            <Button
               onClick={handleSave}
               disabled={isUploading || !fileName.trim()}
-              className={`inline-flex items-center justify-center gap-2 rounded-lg px-6 py-3 text-sm font-semibold text-white focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors shadow-sm ${
+              className={
                 uploadStatus === "success"
-                  ? "bg-green-600 hover:bg-green-700 focus:ring-green-600"
+                  ? "bg-green-600 hover:bg-green-700"
                   : uploadStatus === "error"
-                    ? "bg-red-600 hover:bg-red-700 focus:ring-red-600"
+                    ? "bg-red-600 hover:bg-red-700"
                     : isUploading
                       ? "bg-orange-400 cursor-not-allowed"
-                      : "bg-orange-600 hover:bg-orange-700 focus:ring-orange-600"
-              }`}
+                      : "bg-orange-600 hover:bg-orange-700"
+              }
             >
               {isUploading ? (
                 <>
-                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
                   Uploading...
                 </>
               ) : uploadStatus === "success" ? (
@@ -267,10 +253,10 @@ export function Modal({ open, onClose, videoUrl, videoBlob }: Props) {
                   Save to Cloud
                 </>
               )}
-            </button>
+            </Button>
           </div>
         </div>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   )
 }

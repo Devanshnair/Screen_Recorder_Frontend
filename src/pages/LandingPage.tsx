@@ -1,32 +1,24 @@
-"use client"
-
-import { useState } from "react"
-
-import { AlertTriangle, X, Video, List, User, LogOut } from "lucide-react"
-import { useEffect, useMemo } from "react"
-import { useAuth } from "../contexts/AuthContext"
+import { useState, useEffect, useMemo } from "react"
+import { AlertTriangle, X } from "lucide-react"
+import { useAuth } from "@/contexts/AuthContext"
 import { useNavigate } from "react-router-dom"
-import { LazyVideo } from "../components/LazyVideo"
-import { useRecording } from "../contexts/RecordingContext"
+import { LazyVideo } from "@/components/LazyVideo"
+import { useRecording } from "@/contexts/RecordingContext"
+import { Button } from "@/components/ui/button"
+import { Navbar } from "@/components/Navbar"
 
 export default function LandingPage() {
-  const [toast, setToast] = useState<string | null>("")
-
+  const [toast, setToast] = useState<string | null>(null)
   const { user } = useAuth()
   const navigate = useNavigate()
   const { showBar, registerToast } = useRecording()
-
   const heroVideoSrc = useMemo(() => "/ScreenRecorder_Hero_Vid.mp4", [])
 
   useEffect(() => {
     registerToast(setToast)
   }, [registerToast])
 
-  const handleStartRecording = () => {
-    // Only reveal the floating bar; the bar's Start control actually starts getDisplayMedia.
-    showBar()
-  }
-
+  const handleStartRecording = () => showBar()
   const handleViewRecordings = () => {
     if (!user) {
       navigate("/login", { state: { from: { pathname: "/recordings" } } })
@@ -36,199 +28,128 @@ export default function LandingPage() {
   }
 
   return (
-    <div className="min-h-dvh bg-white font-sans text-slate-900">
+    <div className="min-h-screen bg-white dark:bg-[#090a10] text-slate-900 dark:text-slate-100 transition-colors duration-200 overflow-x-hidden">
+      {/* Toast */}
       {toast && (
-        <div className="fixed right-4 top-4 z-50 w-auto max-w-sm animate-in slide-in-from-right-full duration-300">
-          <div className="rounded-xl border border-violet-200 bg-gradient-to-r from-violet-50/95 via-violet-50 to-violet-50/95 px-4 py-3 shadow-lg backdrop-blur-sm">
-            <div className="flex items-start gap-3">
-              <div className="flex-shrink-0 mt-1.5">
-                <AlertTriangle className="h-5 w-5 text-red-500" />
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-slate-700 leading-relaxed">{toast}</p>
-              </div>
-              <button
-                onClick={() => setToast(null)}
-                className="flex-shrink-0 rounded-lg p-1 text-violet-400 hover:text-violet-600 hover:bg-violet-100/50 transition-colors"
-              >
-                <X className="h-4 w-4 text-red-500" />
-              </button>
-            </div>
+        <div className="fixed right-4 top-4 z-50 animate-in slide-in-from-right-4 duration-300">
+          <div className="flex items-start gap-3 rounded-xl border border-violet-200 dark:border-violet-900/50 bg-white dark:bg-slate-900 px-4 py-3 shadow-lg">
+            <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-red-500" />
+            <p className="text-sm text-slate-700 dark:text-slate-200">{toast}</p>
+            <Button variant="ghost" size="icon" onClick={() => setToast(null)} className="h-5 w-5 shrink-0 -mr-1">
+              <X className="h-3 w-3" />
+            </Button>
           </div>
         </div>
       )}
 
       <Navbar />
 
-      <main className="mx-auto max-w-6xl px-4 pt-28 pb-16">
-        <section className="mx-auto max-w-3xl text-center">
-          <h1 className="text-pretty text-4xl font-bold sm:text-5xl">Record your screen in seconds</h1>
-          <p className="mt-4 text-slate-600">
-            One-click recording with live controls, microphone support, and quick export. Built for speed and
-            simplicity.
+      <main className="mx-auto max-w-5xl px-4 pt-24 pb-24">
+        {/* ── Hero ── */}
+        <section className="mx-auto max-w-3xl text-center" style={{ animation: "fadeUp 0.6s cubic-bezier(0.16,1,0.3,1) both" }}>
+          <h1
+            className="text-5xl sm:text-6xl lg:text-7xl font-bold tracking-[-0.03em] leading-[1.08] text-slate-900 dark:text-white"
+            style={{ animation: "fadeUp 0.6s 80ms cubic-bezier(0.16,1,0.3,1) both" }}
+          >
+            Record your screen
+            <br />
+            <span className="text-slate-400 dark:text-slate-500">in seconds.</span>
+          </h1>
+
+          <p
+            className="mt-6 text-lg leading-relaxed text-slate-600 dark:text-slate-400 max-w-xl mx-auto"
+            style={{ animation: "fadeUp 0.6s 160ms cubic-bezier(0.16,1,0.3,1) both" }}
+          >
+            Capture your screen with microphone audio, pause and review instantly,
+            then save or share — all without leaving your browser.
           </p>
 
-          <div className="mt-6 flex flex-col items-center justify-center gap-3 sm:flex-row">
-            <button
+          <div
+            className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-3"
+            style={{ animation: "fadeUp 0.6s 240ms cubic-bezier(0.16,1,0.3,1) both" }}
+          >
+            <Button
               onClick={handleStartRecording}
-              className="inline-flex items-center gap-2 rounded-full bg-orange-600 px-5 py-3 text-sm font-semibold text-white hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-orange-600"
+              className="rounded-full bg-orange-600 hover:bg-orange-700 active:scale-[0.98] text-white px-8 py-3 h-auto text-sm font-semibold shadow-sm transition-all duration-150"
             >
-              <span className="inline-block h-2 w-2 rounded-full bg-white" />
+              <span className="mr-1.5 inline-block h-2 w-2 rounded-full bg-white/90" />
               Start Recording
-            </button>
-            <button
+            </Button>
+            <Button
+              variant="outline"
               onClick={handleViewRecordings}
-              className="inline-flex items-center gap-2 rounded-full border border-violet-600 px-5 py-3 text-sm font-semibold text-violet-600 hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-violet-600"
+              className="rounded-full border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60 hover:border-slate-400 dark:hover:border-slate-600 px-8 py-3 h-auto text-sm font-semibold transition-all duration-150"
             >
-              View Recordings
-            </button>
+              View My Recordings
+            </Button>
           </div>
 
-          <div className="mt-10">
-            <div className="mx-auto aspect-video w-full max-w-3xl overflow-hidden rounded-2xl border border-violet-600/30 shadow-lg">
+          {/* Hero video */}
+          <div
+            className="mt-14"
+            style={{ animation: "scaleIn 0.7s 320ms cubic-bezier(0.16,1,0.3,1) both" }}
+          >
+            <div className="relative mx-auto aspect-video w-full overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-800 shadow-md bg-black">
               <LazyVideo src={heroVideoSrc} className="h-full w-full object-cover" playbackRate={2} />
             </div>
           </div>
         </section>
 
-        <section id="features" className="mx-auto mt-24 max-w-5xl">
-          <h2 className="text-balance text-3xl font-semibold text-slate-900 md:text-4xl">
-            Everything you need to record and share
-          </h2>
-          <p className="mt-2 text-lg text-slate-600">
-            Fast, private, and simple—focused on the core assignment requirements.
-          </p>
-
-          <div className="mt-8 grid gap-6 md:grid-cols-3">
-            <FeatureCard
-              title="Start & Stop with Timer"
-              body="Record the active tab and mic audio with clear controls and a live counter. Automatically stops at 3 minutes."
-              accent="orange"
-            />
-            <FeatureCard
-              title="Preview & Download"
-              body="Review your clip immediately after stopping, and save it locally with a single click."
-              accent="violet"
-            />
-            <FeatureCard
-              title="Upload & List"
-              body="Send your recording to the Node/Express API and list uploads with title, size, created date, and inline playback."
-              accent="orange"
-            />
+        {/* ── Features ── */}
+        <section className="mt-28">
+          <div style={{ animation: "fadeUp 0.6s 400ms cubic-bezier(0.16,1,0.3,1) both" }}>
+            <h2 className="text-2xl font-semibold tracking-tight text-slate-900 dark:text-white">
+              Everything you need, nothing you don't.
+            </h2>
+            <p className="mt-2 text-slate-500 dark:text-slate-400 text-base">
+              Built for speed. Works instantly, right in your browser.
+            </p>
           </div>
 
-          <div className="mt-6 rounded-lg bg-emerald-600/5 p-4 text-base text-slate-600">
-            Note: Recording requires Chrome support for tab capture. Safari support is optional and can show a friendly
-            fallback.
+          <div className="mt-8 grid gap-4 sm:grid-cols-3" style={{ animation: "fadeUp 0.6s 480ms cubic-bezier(0.16,1,0.3,1) both" }}>
+            <FeatureCard
+              dot="orange"
+              title="One-click recording"
+              body="Hit record and you're live. Capture up to 3 minutes with your microphone included."
+            />
+            <FeatureCard
+              dot="violet"
+              title="Instant preview"
+              body="Review your clip the moment you stop. No processing, no waiting — it's ready immediately."
+            />
+            <FeatureCard
+              dot="orange"
+              title="Save &amp; revisit"
+              body="Your recordings are stored in your account. Replay, download, or share them any time."
+            />
           </div>
         </section>
       </main>
+
+      <style>{`
+        @keyframes fadeUp {
+          from { opacity: 0; transform: translateY(20px); }
+          to   { opacity: 1; transform: translateY(0);    }
+        }
+        @keyframes scaleIn {
+          from { opacity: 0; transform: scale(0.97); }
+          to   { opacity: 1; transform: scale(1);    }
+        }
+      `}</style>
     </div>
   )
 }
 
-export const Navbar = () => {
-  const [showUserDropdown, setShowUserDropdown] = useState<boolean>(false)
-  const { user, setUser } = useAuth()
-  const navigate = useNavigate()
-
-  const handleViewRecordings = () => {
-    if (!user) {
-      navigate("/login", { state: { from: { pathname: "/recordings" } } })
-      return
-    }
-    navigate("/recordings")
-  }
-
-  const handleLogout = () => {
-    localStorage.removeItem("accessToken")
-    localStorage.removeItem("refreshToken")
-    setUser(null)
-    setShowUserDropdown(false)
-    navigate("/")
-  }
-
+function FeatureCard({ dot, title, body }: { dot: "orange" | "violet"; title: string; body: string }) {
   return (
-    <header className="fixed inset-x-0 top-0 z-40 px-10">
-      <div className="absolute left-1/2 top-4 -translate-x-1/2">
-        <div className="rounded-full border border-violet-600/30 bg-white/60 px-6 py-2 backdrop-blur-md shadow-sm">
-          <span className="text-sm font-semibold tracking-wide text-slate-900 cursor-default">ScreenRecorder</span>
-        </div>
+    <div className="group rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-5 transition-colors duration-200 hover:border-slate-300 dark:hover:border-slate-700">
+      <div className="flex items-center gap-2.5 mb-2">
+        <span
+          className={`inline-block h-2 w-2 rounded-full ${dot === "orange" ? "bg-orange-500" : "bg-violet-500"}`}
+        />
+        <h3 className="text-sm font-semibold text-slate-900 dark:text-white" dangerouslySetInnerHTML={{ __html: title }} />
       </div>
-
-      <div className="flex items-center justify-end gap-4 px-4 py-4">
-        <nav className="flex items-center gap-2">
-          <button
-            onClick={() => navigate("/")}
-            className={`inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium rounded-lg transition-colors ${
-              window.location.pathname === "/"
-                ? "bg-violet-100 text-violet-700"
-                : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
-            }`}
-          >
-            <Video className="w-4 h-4" />
-            Record
-          </button>
-          <button
-            onClick={handleViewRecordings}
-            className={`inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium rounded-lg transition-colors ${
-              window.location.pathname === "/recordings"
-                ? "bg-violet-100 text-violet-700"
-                : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
-            }`}
-          >
-            <List className="w-4 h-4" />
-            My Recordings
-          </button>
-        </nav>
-
-        {user ? (
-          <div className="relative">
-            <button
-              onClick={() => setShowUserDropdown(!showUserDropdown)}
-              className="inline-flex items-center justify-center rounded-full bg-gray-300 w-9 h-9 text-white hover:bg-gray-400 focus:outline-none transition-colors"
-            >
-              <User className="w-5 h-5" />
-            </button>
-
-            {showUserDropdown && (
-              <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
-                <div className="p-3 border-b border-gray-100">
-                  <p className="text-sm font-medium text-gray-900 truncate">{user.fullName}</p>
-                  <p className="text-xs text-gray-500 truncate">{user.email}</p>
-                </div>
-                <button
-                  onClick={handleLogout}
-                  className="w-full flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
-                >
-                  <LogOut className="w-4 h-4" />
-                  Logout
-                </button>
-              </div>
-            )}
-          </div>
-        ) : (
-          <button
-            onClick={() => navigate("/login")}
-            className="inline-flex items-center justify-center rounded-lg bg-orange-600 px-4 py-2 text-sm font-semibold text-white hover:opacity-90 focus:outline-none cursor-pointer"
-          >
-            Login
-          </button>
-        )}
-      </div>
-    </header>
-  )
-}
-
-function FeatureCard({ title, body, accent }: { title: string; body: string; accent: "orange" | "violet" }) {
-  const pill = accent === "orange" ? "bg-orange-600" : "bg-violet-600"
-  return (
-    <div className="h-full rounded-2xl border border-violet-600/30 bg-white p-5 shadow-sm">
-      <div className="flex items-center gap-3">
-        <span className={`inline-block h-2.5 w-2.5 rounded-full ${pill}`} aria-hidden="true" />
-        <h3 className="text-xl font-semibold text-slate-900">{title}</h3>
-      </div>
-      <p className="mt-2 text-base leading-relaxed text-slate-600">{body}</p>
+      <p className="text-sm leading-relaxed text-slate-500 dark:text-slate-400" dangerouslySetInnerHTML={{ __html: body }} />
     </div>
   )
 }

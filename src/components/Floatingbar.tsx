@@ -1,9 +1,9 @@
 "use client"
 
 import { useState } from "react"
-
 import { Play, Pause, Mic, MicOff, X, ChevronDown } from "lucide-react"
 import { useRecording } from "../contexts/RecordingContext"
+import { Button } from "@/components/ui/button"
 
 function formatTime(total: number) {
   const mm = String(Math.floor(total / 60)).padStart(2, "0")
@@ -34,7 +34,7 @@ export function FloatingBar() {
 
   return (
     <div className="fixed top-36 right-4 z-50" role="region" aria-label="Recording controls">
-      <div className="flex items-center gap-1 rounded-full bg-white shadow-lg border border-gray-200 p-0.25 h-12">
+      <div className="flex items-center gap-1 rounded-full bg-white dark:bg-slate-900 shadow-lg border border-gray-200 dark:border-slate-800 p-0.5 h-12">
         {/* Start/Stop */}
         <div
           className={`flex justify-center items-center w-11 h-11 rounded-full border-3 transition ${
@@ -44,7 +44,7 @@ export function FloatingBar() {
           <button
             type="button"
             onClick={isRecording ? stop : start}
-            className={`inline-flex items-center justify-center transition focus:outline-none ${
+            className={`inline-flex items-center justify-center transition focus:outline-none cursor-pointer ${
               isRecording
                 ? "rounded-sm w-5 h-5 bg-violet-500 text-white hover:bg-violet-600"
                 : "rounded-full w-8 h-8 bg-orange-600 text-white hover:bg-orange-700"
@@ -56,54 +56,60 @@ export function FloatingBar() {
 
         {/* Pause / Resume */}
         {isRecording ? (
-          <button
+          <Button
             type="button"
+            variant="ghost"
+            size="icon"
             onClick={pauseResume}
-            className="inline-flex items-center justify-center rounded-full p-2 text-violet-500 focus:outline-none transition"
+            className="text-violet-500 hover:bg-slate-100 dark:hover:bg-slate-800 h-8 w-8"
             aria-label={isPaused ? "Resume recording" : "Pause recording"}
             title={isPaused ? "Resume" : "Pause"}
           >
             {isPaused ? <Play size={18} /> : <Pause size={18} />}
-          </button>
+          </Button>
         ) : null}
 
         {/* Mic toggle with dropdown */}
         <div className="relative flex items-center">
-          <button
+          <Button
             type="button"
+            variant="ghost"
+            size="icon"
             onClick={toggleMic}
             aria-pressed={!isMicOn}
             aria-label={isMicOn ? "Mute microphone" : "Unmute microphone"}
-            className="inline-flex items-center justify-center rounded-full p-1 text-slate-500 hover:bg-slate-50 focus:outline-none transition"
+            className="text-slate-500 dark:text-slate-400 h-8 w-8"
             title={isMicOn ? "Mute mic" : "Unmute mic"}
           >
             {isMicOn ? <Mic size={18} /> : <MicOff size={18} />}
-          </button>
+          </Button>
 
-          <button
+          <Button
             type="button"
+            variant="ghost"
+            size="icon"
             onClick={() => setShowMicDropdown((v) => !v)}
-            className="inline-flex items-center justify-center rounded-full p-1 text-slate-500 hover:bg-slate-50 focus:outline-none transition -ml-1"
+            className="text-slate-500 dark:text-slate-400 h-6 w-6 -ml-1"
             aria-label="Microphone options"
             title="Microphone options"
           >
             <ChevronDown size={14} />
-          </button>
+          </Button>
 
           {showMicDropdown && (
-            <div className="absolute top-full left-0 mt-2 w-44 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
+            <div className="absolute top-full left-0 mt-2 w-44 bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 rounded-lg shadow-lg z-50">
               <div className="p-2">
-                <div className="text-sm font-medium text-gray-700 mb-2">Select Microphone</div>
+                <div className="text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">Select Microphone</div>
                 <div className="space-y-1">
                   {audioInputDevices?.map((device, ind) => (
                     <button
                       key={ind}
                       onClick={() => changeMicrophone(device.deviceId)}
-                      className={`w-full text-left px-3 py-2 text-sm ${
-                        currentMicInput == device.deviceId
-                          ? "text-violet-400 bg-violet-100 hover:bg-violet-200"
-                          : "text-gray-700 hover:bg-gray-100"
-                      }  rounded`}
+                      className={`w-full text-left px-3 py-2 text-sm cursor-pointer rounded transition-colors ${
+                        currentMicInput === device.deviceId
+                          ? "text-violet-600 dark:text-violet-400 bg-violet-100 dark:bg-violet-950/60 hover:bg-violet-200 dark:hover:bg-violet-950"
+                          : "text-gray-700 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-800"
+                      }`}
                     >
                       {device.label}
                     </button>
@@ -120,21 +126,23 @@ export function FloatingBar() {
             className={`inline-block h-2 w-2 rounded-full ${isRecording && !isPaused ? "bg-red-500" : "bg-gray-400"}`}
             aria-hidden="true"
           />
-          <span className="text-sm text-black">
-            {formatTime(elapsedSeconds)} / <span className="text-gray-500">3:00</span>
+          <span className="text-sm text-black dark:text-slate-200">
+            {formatTime(elapsedSeconds)} / <span className="text-gray-500 dark:text-slate-400">3:00</span>
           </span>
         </div>
 
         {/* Close button */}
-        <button
+        <Button
           type="button"
+          variant="ghost"
+          size="icon"
           onClick={closeBar}
-          className="inline-flex items-center justify-center rounded-full p-1 text-gray-400 hover:text-gray-600 focus:outline-none transition ml-1"
+          className="text-gray-400 hover:text-gray-600 dark:hover:text-slate-200 ml-1 h-7 w-7"
           aria-label="Close recording bar"
           title="Close"
         >
           <X size={16} />
-        </button>
+        </Button>
       </div>
     </div>
   )
