@@ -15,9 +15,8 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     if (typeof window !== "undefined") {
       const saved = localStorage.getItem("app-theme") as Theme | null
       if (saved === "light" || saved === "dark") return saved
-      if (window.matchMedia("(prefers-color-scheme: dark)").matches) return "dark"
     }
-    return "dark"
+    return "light"
   })
 
   useEffect(() => {
