@@ -71,7 +71,7 @@ export function Navbar() {
 
         {/* User menu / Login */}
         {user ? (
-          <DropdownMenu>
+          <DropdownMenu modal={false}>
             <DropdownMenuTrigger asChild>
               <Button
                 variant="ghost"
