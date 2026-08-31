@@ -1,14 +1,16 @@
-import React from 'react';
-import { Navigate, useLocation } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
+"use client"
+
+import type React from "react"
+import { Navigate, useLocation } from "react-router-dom"
+import { useAuth } from "../contexts/AuthContext"
 
 interface ProtectedRouteProps {
-  children: React.ReactNode;
+  children: React.ReactNode
 }
 
 export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
-  const { user, isLoading } = useAuth();
-  const location = useLocation();
+  const { user, isLoading } = useAuth()
+  const location = useLocation()
 
   if (isLoading) {
     return (
@@ -18,13 +20,13 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
           <p className="text-slate-600">Loading...</p>
         </div>
       </div>
-    );
+    )
   }
 
   if (!user) {
     // Redirect to login page with return url
-    return <Navigate to="/login" state={{ from: location }} replace />;
+    return <Navigate to="/login" state={{ from: location }} replace />
   }
 
-  return <>{children}</>;
-};
+  return <>{children}</>
+}

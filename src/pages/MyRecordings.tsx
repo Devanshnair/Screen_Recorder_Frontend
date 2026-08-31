@@ -1,3 +1,5 @@
+"use client"
+
 import { useEffect, useState, useRef, useMemo } from "react"
 import { Play, Download, Calendar, HardDrive, RefreshCw, SearchIcon } from "lucide-react"
 import { Base_Url } from "../App"

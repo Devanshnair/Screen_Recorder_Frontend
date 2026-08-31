@@ -1,10 +1,13 @@
-import { createBrowserRouter, createRoutesFromElements, RouterProvider, Route, Navigate } from "react-router-dom"
+import { createBrowserRouter, createRoutesFromElements, RouterProvider, Route, Navigate, Outlet } from "react-router-dom"
 import LandingPage from "./pages/LandingPage"
 import { Login } from "./pages/Login"
 import { Register } from "./pages/Register"
 import { ProtectedRoute } from "./components/ProtectedRoute"
 import { AuthProvider } from "./contexts/AuthContext"
+import { RecordingProvider } from "./contexts/RecordingContext"
 import { MyRecordings } from "./pages/MyRecordings"
+import { FloatingBar } from "./components/Floatingbar"
+import { RecordingPreviewModal } from "./components/RecordingPreviewModal"
 
 
 export const Base_Url = import.meta.env.VITE_BASE_URL || 
@@ -12,11 +15,22 @@ export const Base_Url = import.meta.env.VITE_BASE_URL ||
     ? 'https://your-backend-url.render.com' 
     : 'http://localhost:8000')
 
+// Layout component that provides recording context within router context
+function Layout() {
+  return (
+    <RecordingProvider>
+      <Outlet />
+      <FloatingBar />
+      <RecordingPreviewModal />
+    </RecordingProvider>
+  )
+}
+
 function App() {
 
   const router = createBrowserRouter(
     createRoutesFromElements(
-        <Route path= "/">
+        <Route path="/" element={<Layout />}>
           <Route index element={<LandingPage />} />    
           <Route path="/record" element={<LandingPage />} />    
           <Route path="/login" element={<Login />} />
@@ -35,7 +49,7 @@ function App() {
   return (
     <>
       <AuthProvider>
-          <RouterProvider router={router} />
+        <RouterProvider router={router} />
       </AuthProvider>
     </>
     )

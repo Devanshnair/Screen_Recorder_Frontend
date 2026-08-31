@@ -50,6 +50,13 @@ export const Login: React.FC = () => {
     const success = await login();
     
     if (success) {
+      // Check if user was redirected here due to a pending recording
+      const shouldResumeRecording = sessionStorage.getItem('resumeRecordingAfterLogin');
+      if (shouldResumeRecording) {
+        // Don't remove the flag here - let the recording context handle it after successful restoration
+        // Trigger a custom event to notify the recording context to restore pending recording
+        window.dispatchEvent(new CustomEvent('restorePendingRecording'));
+      }
       navigate(from, { replace: true });
     } else {
       setError('Invalid email or password');
